@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Google Map</title>
+    <style>
+        /* Style for the map container */
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <script>
+        // Your provided JavaScript code with some adjustments
+        window.google = window.google || {};
+        google.maps = google.maps || {};
+        (function () {
+
+            var modules = google.maps.modules = {};
+            google.maps.__gjsload__ = function (name, text) {
+                modules[name] = text;
+            };
+
+            google.maps.Load = function (apiLoad) {
+                delete google.maps.Load;
+                apiLoad(
+                    [0.009999999776482582, 
+                        [null, 
+                            [
+                            ["https://khms0.googleapis.com/kh?v=928\u0026hl=zh-CN\u0026", "https://khms1.googleapis.com/kh?v=928\u0026hl=zh-CN\u0026"], 
+                            null, null, null, 1, "928", 
+                            ["https://khms0.google.com/kh?v=928\u0026hl=zh-CN\u0026", "https://khms1.google.com/kh?v=928\u0026hl=zh-CN\u0026"]
+                        ], null, null, null, null, 
+                        [["https://cbks0.googleapis.com/cbk?", "https://cbks1.googleapis.com/cbk?"]], 
+                        [
+                            ["https://khms0.googleapis.com/kh?v=143\u0026hl=zh-CN\u0026", "https://khms1.googleapis.com/kh?v=143\u0026hl=zh-CN\u0026"], 
+                            null, null, null, null, "143", 
+                            ["https://khms0.google.com/kh?v=143\u0026hl=zh-CN\u0026", ""]
+                        ], null, null, null, null, null, null, null, [["", ""]]], ["zh-CN", "US", null, 0, null, null, "//www.yxhhdl.com/hykb/hykb_tools/yuanshen/cxq/static_v2/mapfiles/", null, "", "", null, "https://maps.google.com", null,"//www.yxhhdl.com/hykb/hykb_tools/yuanshen/cxq/static_v2/img", "https://www.google.com/maps", null, "https://www.google.com", 1, "/maps_api_js_slo/log?hasfast=true", 0, 1], ["//www.yxhhdl.com/hykb/hykb_tools/yuanshen/cxq/static_v2/map_js/v3", "3.49.10"], [2908573692], null, null, null, null, null, null, "obj.initMap", null, null, 1, "https://khms.googleapis.com/mz?v=928\u0026", "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", "https://earthbuilder.googleapis.com", "https://earthbuilder.googleapis.com", null, "https://mts.googleapis.com/maps/vt/icon", [["/maps/vt"], ["/maps/vt"], null, null, null, null, null, null, null, null, null, null, ["https://www.google.com/maps/vt"], "/maps/vt", 612000000, 612, 612343327], 2, 500, [null, null, null, null, "https://www.google.com/maps/preview/log204", "", "https://static.panoramio.com.storage.googleapis.com/photos/", ["https://geo0.ggpht.com/cbk", "https://geo1.ggpht.com/cbk", "https://geo2.ggpht.com/cbk", "https://geo3.ggpht.com/cbk"], "/maps/api/js/GeoPhotoService.GetMetadata", "/maps/api/js/GeoPhotoService.SingleImageSearch", ["https://lh3.ggpht.com/", "https://lh4.ggpht.com/", "https://lh5.ggpht.com/", "https://lh6.ggpht.com/"], "https://streetviewpixels-pa.googleapis.com/v1/tile"], null, null, null, null, "/maps/api/js/ApplicationService.GetEntityDetails", 0, null, null, null, null, [], ["49.10"], 1, 0, [1], null, null, 1, 0.009999999776482582], loadScriptTime);
+            };
+            var loadScriptTime = (new Date).getTime();
+        })();
+
+        function initMap() {
+            var init_position = "56.871009248911655,-72.62568359375001";
+            var center_position = init_position.split(",");
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: parseFloat(center_position[0]),
+                    lng: parseFloat(center_position[1])
+                },
+                zoom: 6,
+                streetViewControl: false,
+                mapTypeControl: false,
+                disableDefaultUI: true,
+                backgroundColor: '#1E2026'
+            });
+
+            var myMap = new google.maps.ImageMapType({
+                getTileUrl: function (coord, zoom) {
+                    var normalizedCoord = getNormalizedCoord(coord, zoom);
+                    if (!normalizedCoord) {
+                        return null;
+                    }
+
+                    var xy_deny = {
+                        "zoom_4": [4, 4],
+                        "zoom_5": [8, 9],
+                        "zoom_6": [16, 19],
+                        "zoom_7": [32, 39],
+                        "zoom_8": [64, 79],
+                        "zoom_9": [128, 159],
+                        "zoom_10": [256, 219],
+                        "zoom_11": [512, 639],
+                        "zoom_12": [1024, 1279],
+                        "zoom_13": [2048, 2559]
+                    };
+                    if (zoom < 4 || zoom > 9) {
+                        return null;
+                    }
+                    var temp = xy_deny["zoom_" + zoom];
+                    if ((temp[0] <= normalizedCoord.x && normalizedCoord.x <= temp[1]) &&
+                        (temp[0] <= normalizedCoord.y && normalizedCoord.y <= temp[1])) {
+                        return `statics/yuan_${zoom}_${normalizedCoord.x}_${normalizedCoord.y}.png`;
+                    } else {
+                        return null;
+                    }
+                },
+                tileSize: new google.maps.Size(256, 256),
+                maxZoom: 9,
+                minZoom: 6,
+                name: 'Default'
+            });
+            map.mapTypes.set('default', myMap);
+            map.setMapTypeId('default');
+
+            google.maps.event.addListener(map, 'zoom_changed', function () {
+                if (map.zoom < 6) {
+                    map.zoom = 6;
+                }
+            });
+
+            var strictBounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(66, -89.4),
+                new google.maps.LatLng(57, -67.40522460937501)
+            );
+
+            google.maps.event.addListener(map, 'dragend', function () {
+                if (strictBounds.contains(map.getCenter())) return;
+
+                var c = map.getCenter(),
+                    x = c.lng(),
+                    y = c.lat(),
+                    maxX = strictBounds.getNorthEast().lng(),
+                    maxY = strictBounds.getSouthWest().lat(),
+                    minX = strictBounds.getSouthWest().lng(),
+                    minY = strictBounds.getNorthEast().lat();
+
+                if (x < minX) x = minX;
+                if (x > maxX) x = maxX;
+                if (y < minY) y = minY;
+                if (y > maxY) y = maxY;
+
+                map.setCenter(new google.maps.LatLng(y, x));
+            });
+
+            // Additional initializations like mini map can be done here
+        }
+
+        function getNormalizedCoord(coord, zoom) {
+            var y = coord.y;
+            var x = coord.x;
+
+            var tileRange = 1 << zoom;
+
+            if (y < 0 || y >= tileRange) {
+                return null;
+            }
+            if (x < 0 || x >= tileRange) {
+                return null;
+            }
+
+            return { x: x, y: y };
+        }
+    </script>
+</body>
+</html>
